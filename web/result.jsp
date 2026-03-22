@@ -1,65 +1,88 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> <!DOCTYPE html>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %> 
+<!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Kết Quả Đề Xuất Laptop</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
-        .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { color: #0056b3; }
-        .ai-result { background: #e9ecef; padding: 15px; border-left: 5px solid #007bff; margin-bottom: 20px; font-size: 18px;}
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: center; }
-        th { background-color: #007bff; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .back-btn { display: inline-block; margin-top: 20px; text-decoration: none; background: #6c757d; color: white; padding: 10px 15px; border-radius: 4px; }
-        .back-btn:hover { background: #5a6268; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        .container { max-width: 1200px; margin: auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
+        .ai-result { background: #e3f2fd; padding: 15px; border-left: 6px solid #2196f3; margin-bottom: 25px; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { padding: 12px; border: 1px solid #e2e8f0; text-align: center; }
+        th { background-color: #2196f3; color: white; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:hover { background-color: #edf2f7; transition: 0.3s; }
+        /* Tự động đổi màu Badge dựa trên độ phù hợp nếu cần (logic bổ sung) */
+        .score-badge { background: #4caf50; color: white; padding: 6px 10px; border-radius: 20px; font-weight: bold; font-size: 13px; display: inline-block; min-width: 50px; }
+        .back-btn { display: inline-block; margin-top: 25px; text-decoration: none; background: #64748b; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+        .back-btn:hover { background: #475569; }
+        .price-tag { color: #d32f2f; font-weight: bold; font-size: 15px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Kết Quả Tư Vấn (Decision Support System)</h2>
+        <h2>🏆 KẾT QUẢ TƯ VẤN HỆ THỐNG DSS</h2>
         
         <div class="ai-result">
-            <strong>Trí tuệ nhân tạo (AI) dự đoán nhu cầu của bạn là:</strong> 
-            <span style="color: #d9534f; font-weight: bold;">${predictedCategory}</span>
+            <strong>Phân khúc AI xác định cho bạn:</strong> 
+            <span style="color: #1976d2; font-size: 22px; text-transform: uppercase; font-weight: 800; margin-left: 10px;">
+                <%-- Sử dụng thuộc tính đã được map chính xác --%>
+                ${not empty laptopList ? laptopList[0].target_category : 'Đang phân tích...'}
+            </span>
         </div>
 
-        <h3>Top Laptop Phù Hợp Nhất (Theo Ngân Sách)</h3>
+        <h3>Top 5 Laptop Phù Hợp Nhất Với Yêu Cầu</h3>
         
         <c:choose>
-            <c:when test="${empty laptopList}">
-                <p style="color: red;">Rất tiếc, không tìm thấy laptop nào phù hợp với yêu cầu và ngân sách của bạn trong hệ thống.</p>
+            <%-- Kiểm tra nếu danh sách trống hoặc chứa máy báo lỗi từ Python --%>
+            <c:when test="${empty laptopList || laptopList[0].laptop_name == 'KHÔNG CÓ MÁY PHÙ HỢP VỚI NGÂN SÁCH/YÊU CẦU'}">
+                <div style="text-align: center; padding: 40px; border: 2px dashed #cbd5e0; border-radius: 8px;">
+                    <p style="color: #e53e3e; font-size: 18px; font-weight: bold;">Rất tiếc, không tìm thấy laptop nào phù hợp với ngân sách của bạn.</p>
+                    <p>Mẹo: Hãy thử tăng <b>Ngân sách</b> hoặc điều chỉnh lại yêu cầu cấu hình.</p>
+                </div>
             </c:when>
             <c:otherwise>
                 <table>
                     <thead>
                         <tr>
-                            <th>Tên Máy</th>
+                            <th width="30%">Tên Laptop</th>
                             <th>Thương Hiệu</th>
-                            <th>Mức Giá (VNĐ)</th>
+                            <th>Giá Bán</th>
                             <th>RAM</th>
                             <th>Ổ Cứng</th>
                             <th>Màn Hình</th>
-                            <th>Hiệu Năng (Score)</th>
-                            <th>Value Score</th>
+                            <th>Tần Số Quét</th>
+                            <th>Độ Phù Hợp</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach items="${laptopList}" var="laptop">
                             <tr>
-                                <td style="text-align: left; font-weight: bold;">${laptop.laptop_name}</td>
-                                <td>${laptop.brand}</td>
-                                <td style="color: #28a745; font-weight: bold;">
-                                    <fmt:formatNumber value="${laptop.price_vnd}" type="number" pattern="###,###"/> đ
+                                <td style="text-align: left; font-weight: 600; color: #2d3748;">
+                                    ${laptop.laptop_name}
+                                </td>
+                                <td style="text-transform: uppercase; font-weight: 500;">
+                                    ${laptop.brand}
+                                </td>
+                                <td>
+                                    <span class="price-tag">
+                                        <fmt:formatNumber value="${laptop.price_vnd}" type="number" pattern="###,###"/> đ
+                                    </span>
                                 </td>
                                 <td>${laptop.ram_gb} GB</td>
                                 <td>${laptop.storage_gb} GB</td>
-                                <td>${laptop.screen_size}</td>
-                                <td>${laptop.performance_score}</td>
-                                <td>${laptop.value_score}</td>
+                                <td>${laptop.screen_size_num}"</td>
+                                <td>${laptop.refresh_rate}</td>
+                                <td>
+                                    <span class="score-badge">
+                                        <%-- Định dạng hiển thị phần trăm phù hợp --%>
+                                        <fmt:formatNumber value="${laptop.similarity_score}" maxFractionDigits="1"/>%
+                                    </span>
+                                </td>
                             </tr>
                         </c:forEach>
                     </tbody>
@@ -67,7 +90,7 @@
             </c:otherwise>
         </c:choose>
 
-        <a href="index.jsp" class="back-btn">← Thử cấu hình khác</a>
+        <a href="home" class="back-btn">← Quay lại chỉnh sửa cấu hình</a>
     </div>
 </body>
 </html>

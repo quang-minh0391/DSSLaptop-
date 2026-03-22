@@ -8,44 +8,20 @@ import java.util.List;
 
 public class DAOLaptopData extends DBContext {
 
-    // Lấy danh sách laptop (có tìm kiếm theo tên laptop và thương hiệu)
-    public List<laptop_data> getList(String laptopName, String brand) {
-        List<laptop_data> list = new ArrayList<>();
-        String sql = "SELECT * FROM laptop_data WHERE laptop_name LIKE ? AND brand LIKE ?";
+    // --- CÁC HÀM MỚI BỔ SUNG ĐỂ LẤY DỮ LIỆU ĐỘNG CHO TRANG CHỦ ---
 
+    /**
+     * Lấy danh sách các loại Môi trường sử dụng duy nhất từ Database
+     */
+    public List<String> getAllEnvironments() {
+        List<String> list = new ArrayList<>();
+        // Lưu ý: Thay đổi "usage_environment" thành tên cột chính xác trong DB của bạn
+        String sql = "SELECT DISTINCT usage_environment FROM laptop_data WHERE usage_environment IS NOT NULL AND usage_environment != ''";
         try {
             PreparedStatement pre = conn.prepareStatement(sql);
-            pre.setString(1, "%" + (laptopName == null ? "" : laptopName) + "%");
-            pre.setString(2, "%" + (brand == null ? "" : brand) + "%");
-
             ResultSet rs = pre.executeQuery();
             while (rs.next()) {
-                list.add(new laptop_data(
-                    rs.getInt("id"),
-                    rs.getString("laptop_name"),
-                    rs.getString("brand"),
-                    rs.getLong("price_vnd"),
-                    rs.getString("price_segment"),
-                    rs.getString("cpu_class"),
-                    rs.getString("cpu_technology"),
-                    rs.getString("gpu_type"),
-                    rs.getString("screen_size"),
-                    rs.getString("refresh_rate"),
-                    rs.getString("os"),
-                    rs.getString("target_category"),
-                    rs.getInt("cpu_score"),
-                    rs.getInt("ram_gb"),
-                    rs.getInt("gpu_encoded"),
-                    rs.getInt("storage_gb"),
-                    rs.getDouble("screen_size_num"),
-                    rs.getDouble("battery_wh"),
-                    rs.getInt("refresh_rate_score"),
-                    rs.getInt("os_encoded"),
-                    rs.getInt("performance_score"),
-                    rs.getString("future_compatibility_level"),
-                    rs.getDouble("value_score"),
-                    rs.getString("market_popularity")
-                ));
+                list.add(rs.getString(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,115 +29,96 @@ public class DAOLaptopData extends DBContext {
         return list;
     }
 
-    // Thêm mới laptop
-    public int insert(laptop_data l) {
-        String sql = "INSERT INTO laptop_data (laptop_name, brand, price_vnd, price_segment, cpu_class, "
-                   + "cpu_technology, gpu_type, screen_size, refresh_rate, os, target_category, "
-                   + "cpu_score, ram_gb, gpu_encoded, storage_gb, screen_size_num, battery_wh, "
-                   + "refresh_rate_score, os_encoded, performance_score, future_compatibility_level, "
-                   + "value_score, market_popularity) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    /**
+     * Lấy danh sách các Tần suất sử dụng duy nhất từ Database
+     */
+    public List<String> getAllFrequencies() {
+        List<String> list = new ArrayList<>();
+        // Lưu ý: Thay đổi "usage_frequency" thành tên cột chính xác trong DB của bạn
+        String sql = "SELECT DISTINCT usage_frequency FROM laptop_data WHERE usage_frequency IS NOT NULL AND usage_frequency != ''";
         try {
             PreparedStatement pre = conn.prepareStatement(sql);
-            pre.setString(1, l.getLaptop_name());
-            pre.setString(2, l.getBrand());
-            pre.setLong(3, l.getPrice_vnd());
-            pre.setString(4, l.getPrice_segment());
-            pre.setString(5, l.getCpu_class());
-            pre.setString(6, l.getCpu_technology());
-            pre.setString(7, l.getGpu_type());
-            pre.setString(8, l.getScreen_size());
-            pre.setString(9, l.getRefresh_rate());
-            pre.setString(10, l.getOs());
-            pre.setString(11, l.getTarget_category());
-            pre.setInt(12, l.getCpu_score());
-            pre.setInt(13, l.getRam_gb());
-            pre.setInt(14, l.getGpu_encoded());
-            pre.setInt(15, l.getStorage_gb());
-            pre.setDouble(16, l.getScreen_size_num());
-            pre.setDouble(17, l.getBattery_wh());
-            pre.setInt(18, l.getRefresh_rate_score());
-            pre.setInt(19, l.getOs_encoded());
-            pre.setInt(20, l.getPerformance_score());
-            pre.setString(21, l.getFuture_compatibility_level());
-            pre.setDouble(22, l.getValue_score());
-            pre.setString(23, l.getMarket_popularity());
-
-            return pre.executeUpdate();
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return list;
     }
 
-    // Cập nhật thông tin laptop (Cập nhật toàn bộ các trường dựa theo ID)
-    public int update(laptop_data l) {
-        String sql = "UPDATE laptop_data SET laptop_name = ?, brand = ?, price_vnd = ?, price_segment = ?, "
-                   + "cpu_class = ?, cpu_technology = ?, gpu_type = ?, screen_size = ?, refresh_rate = ?, "
-                   + "os = ?, target_category = ?, cpu_score = ?, ram_gb = ?, gpu_encoded = ?, storage_gb = ?, "
-                   + "screen_size_num = ?, battery_wh = ?, refresh_rate_score = ?, os_encoded = ?, "
-                   + "performance_score = ?, future_compatibility_level = ?, value_score = ?, market_popularity = ? "
-                   + "WHERE id = ?";
+    /**
+     * Lấy danh sách các Thương hiệu duy nhất (Dùng để load động phần Thương hiệu)
+     */
+    public List<String> getAllBrands() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT Brand FROM laptop_data WHERE Brand IS NOT NULL ORDER BY Brand ASC";
         try {
             PreparedStatement pre = conn.prepareStatement(sql);
-            pre.setString(1, l.getLaptop_name());
-            pre.setString(2, l.getBrand());
-            pre.setLong(3, l.getPrice_vnd());
-            pre.setString(4, l.getPrice_segment());
-            pre.setString(5, l.getCpu_class());
-            pre.setString(6, l.getCpu_technology());
-            pre.setString(7, l.getGpu_type());
-            pre.setString(8, l.getScreen_size());
-            pre.setString(9, l.getRefresh_rate());
-            pre.setString(10, l.getOs());
-            pre.setString(11, l.getTarget_category());
-            pre.setInt(12, l.getCpu_score());
-            pre.setInt(13, l.getRam_gb());
-            pre.setInt(14, l.getGpu_encoded());
-            pre.setInt(15, l.getStorage_gb());
-            pre.setDouble(16, l.getScreen_size_num());
-            pre.setDouble(17, l.getBattery_wh());
-            pre.setInt(18, l.getRefresh_rate_score());
-            pre.setInt(19, l.getOs_encoded());
-            pre.setInt(20, l.getPerformance_score());
-            pre.setString(21, l.getFuture_compatibility_level());
-            pre.setDouble(22, l.getValue_score());
-            pre.setString(23, l.getMarket_popularity());
-            
-            // Tham số WHERE ID
-            pre.setInt(24, l.getId());
-
-            return pre.executeUpdate();
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                list.add(rs.getString(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return list;
     }
-    // Trong class DAOLaptopData.java
 
-public List<laptop_data> getTop5RecommendedLaptops(String predictedCategory, long userBudget) {
-    List<laptop_data> list = new ArrayList<>();
-    
-    // Câu truy vấn SQL lọc theo Target_Category và nhỏ hơn hoặc bằng User_Budget
-    // Sắp xếp theo Performance_Score để lấy máy hiệu năng cao nhất [cite: 404]
-    String sql = "SELECT * FROM laptop_data "
-               + "WHERE target_category = ? AND price_vnd <= ? "
-               + "ORDER BY performance_score DESC LIMIT 5";
+    // --- CÁC HÀM CŨ CỦA BẠN ---
 
-    try {
-        PreparedStatement pre = conn.prepareStatement(sql);
-        pre.setString(1, predictedCategory);
-        pre.setLong(2, userBudget);
+    public List<laptop_data> getTop5RecommendedLaptops(String predictedCategory, long userBudget) {
+        List<laptop_data> list = new ArrayList<>();
+        String sql = "SELECT * FROM laptop_data "
+                   + "WHERE target_category = ? AND price_vnd <= ? "
+                   + "ORDER BY performance_score DESC LIMIT 5";
 
-        ResultSet rs = pre.executeQuery();
-        while (rs.next()) {
-            list.add(new laptop_data(
-                // ... map các trường giống hàm getList() cũ
-            ));
+        try {
+            if (conn == null || conn.isClosed()) {
+                return list;
+            }
+            PreparedStatement pre = conn.prepareStatement(sql);
+            pre.setString(1, predictedCategory);
+            pre.setLong(2, userBudget);
+
+            ResultSet rs = pre.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToLaptop(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
+
+    private laptop_data mapResultSetToLaptop(ResultSet rs) throws SQLException {
+        laptop_data item = new laptop_data();
+        item.setId(rs.getInt("id"));
+        item.setLaptop_name(rs.getString("laptop_name"));
+        item.setBrand(rs.getString("brand"));
+        item.setPrice_vnd(rs.getLong("price_vnd"));
+        item.setPrice_segment(rs.getString("price_segment"));
+        item.setCpu_class(rs.getString("cpu_class"));
+        item.setCpu_technology(rs.getString("cpu_technology"));
+        item.setGpu_type(rs.getString("gpu_type"));
+        item.setScreen_size(rs.getString("screen_size"));
+        item.setRefresh_rate(rs.getString("refresh_rate"));
+        item.setOs(rs.getString("os"));
+        item.setTarget_category(rs.getString("target_category"));
+        item.setCpu_score(rs.getInt("cpu_score"));
+        item.setRam_gb(rs.getInt("ram_gb"));
+        item.setGpu_encoded(rs.getInt("gpu_encoded"));
+        item.setStorage_gb(rs.getInt("storage_gb"));
+        item.setScreen_size_num(rs.getDouble("screen_size_num"));
+        item.setBattery_wh(rs.getDouble("battery_wh"));
+        item.setRefresh_rate_score(rs.getInt("refresh_rate_score"));
+        item.setOs_encoded(rs.getInt("os_encoded"));
+        item.setPerformance_score(rs.getInt("performance_score"));
+        item.setFuture_compatibility_level(rs.getString("future_compatibility_level"));
+        item.setValue_score(rs.getDouble("value_score"));
+        item.setMarket_popularity(rs.getString("market_popularity"));
+        item.setSimilarity_score(0.0); 
+        return item;
+    }
 }

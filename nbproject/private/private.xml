@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/demo/DSSLaptop/web/result.jsp</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/DAO/DAOLaptopData.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Service/DSSService.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Model/target_category.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Model/laptop_data.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/DAO/DAOFrequency.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/DAO/DAOTargetCategory.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Model/user.java</file>
+            <file>file:/D:/demo/DSSLaptop/web/index.jsp</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Model/Environment.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Controller/RecommendServlet.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Controller/HomeServlet.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/Model/Frequency.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/DAL/DBContext.java</file>
+            <file>file:/D:/demo/DSSLaptop/src/java/DAO/DAOEnvironment.java</file>
+        </group>
+    </open-files>
+</project-private>
